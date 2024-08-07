@@ -1,5 +1,6 @@
 package com.example.lipsensor
 
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.Menu
 import com.google.android.material.snackbar.Snackbar
@@ -12,11 +13,17 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import com.example.lipsensor.databinding.ActivityMainBinding
+import com.nixsensor.universalsdk.IDeviceScanner
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
+
+    companion object {
+        // Define a constant value of your choice here
+        const val PERMISSION_REQUEST_BLUETOOTH = 1000
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,6 +53,14 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
+        // Request Bluetooth permissions if necessary
+        if (!IDeviceScanner.isBluetoothPermissionGranted(this)) {
+            IDeviceScanner.requestBluetoothPermissions(
+                activity = this,
+                requestCode = PERMISSION_REQUEST_BLUETOOTH
+            )
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -57,5 +72,30 @@ class MainActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        // Check if all requested permissions have been granted
+        var allGranted = true
+        for (result in grantResults) allGranted =
+            allGranted and (result == PackageManager.PERMISSION_GRANTED)
+
+        when (requestCode) {
+            PERMISSION_REQUEST_BLUETOOTH -> {
+                if (allGranted) {
+                    // All permissions granted, OK to use `DeviceScanner`
+                    // ...
+                } else {
+                    // Handle permission denial
+                    // ...
+                }
+            }
+        }
     }
 }

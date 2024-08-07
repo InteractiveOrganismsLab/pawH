@@ -98,6 +98,6 @@ dependencies {
 
 
     // Nix Universal SDK
-    implementation 'com.nixsensor:universalsdk:4.1.0'
+    implementation ("com.nixsensor:universalsdk:4.1.0")
 
 }
