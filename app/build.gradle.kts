@@ -97,5 +97,7 @@ dependencies {
     annotationProcessor ("com.github.bumptech.glide:compiler:4.15.1")
 
 
+    // Nix Universal SDK
+    implementation 'com.nixsensor:universalsdk:4.1.0'
 
 }
