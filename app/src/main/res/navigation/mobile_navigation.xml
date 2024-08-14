@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/nav_home"
-        android:name="com.example.lipsensor.ui.home.HomeFragment"
+        android:name="com.example.dogapp.ui.home.HomeFragment"
         android:label="@string/menu_home"
         tools:layout="@layout/fragment_home" >
 
@@ -23,13 +23,13 @@
 
     <fragment
         android:id="@+id/nav_gallery"
-        android:name="com.example.lipsensor.ui.gallery.GalleryFragment"
+        android:name="com.example.dogapp.ui.gallery.GalleryFragment"
         android:label="@string/menu_gallery"
         tools:layout="@layout/fragment_gallery" />
 
     <fragment
         android:id="@+id/nav_slideshow"
-        android:name="com.example.lipsensor.ui.slideshow.SlideshowFragment"
+        android:name="com.example.dogapp.ui.slideshow.SlideshowFragment"
         android:label="@string/menu_slideshow"
         tools:layout="@layout/fragment_slideshow" >
         <action
@@ -39,13 +39,13 @@
 
     <fragment
         android:id="@+id/nav_logout"
-        android:name="com.example.lipsensor.ui.logout.LogoutFragment"
+        android:name="com.example.dogapp.ui.logout.LogoutFragment"
         android:label="@string/menu_logout"
         tools:layout="@layout/fragment_logout" />
 
     <fragment
         android:id="@+id/nav_camera"
-        android:name="com.example.lipsensor.ui.camera.CameraFragment"
+        android:name="com.example.dogapp.ui.camera.CameraFragment"
         android:label="@string/menu_camera"
         tools:layout="@layout/fragment_camera" >
         <action
@@ -55,18 +55,24 @@
 
     <activity
         android:id="@+id/nav_function"
-        android:name="com.example.lipsensor.ui.camera.CameraActivity"
+        android:name="com.example.dogapp.ui.camera.CameraActivity"
         android:label="@string/lip_camera"
         tools:layout="@layout/activity_camera" />
 
     <activity
         android:id="@+id/nav_preview"
-        android:name="com.example.lipsensor.ui.camera.PreviewActivity"
+        android:name="com.example.dogapp.ui.camera.PreviewActivity"
         android:label="@string/lip_photo"
         tools:layout="@layout/activity_preview" />
+
+    <activity
+        android:id="@+id/nav_nixsensor"
+        android:name="com.example.dogapp.ui.nixsensor.NixSensorActivity"
+        android:label="@string/nix_sensor"
+        tools:layout="@layout/activity_nixsensor" />
 
     <!-- Define the action to navigate to CameraActivity -->
     <action
         android:id="@+id/global_action_to_function"
-        app:destination="@id/nav_function" />
+        app:destination="@id/nav_nixsensor" />
 </navigation>

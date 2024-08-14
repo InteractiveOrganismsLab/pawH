@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ChromaLipSense</string>
+    <string name="app_name">DogApp</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Howard Ku</string>
@@ -15,6 +15,9 @@
 
     <string name="lip_camera">LipCamera</string>
     <string name="lip_photo">LipCamera</string>
+
+    <string name="nix_sensor">NixSensor</string>
+
 
     <string name="loading_failed">Failed to load</string>
     <string name="retry">Retry</string>

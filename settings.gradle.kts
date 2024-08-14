@@ -21,5 +21,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "LipSensor"
+rootProject.name = "DogApp"
 include(":app")
