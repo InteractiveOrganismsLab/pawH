@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.lipsensor"
+    namespace = "com.example.dogapp"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.lipsensor"
+        applicationId = "com.example.dogapp"
         minSdk = 24
         targetSdk = 33
         versionCode = 1
