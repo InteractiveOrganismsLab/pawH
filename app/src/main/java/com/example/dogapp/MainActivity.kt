@@ -54,13 +54,7 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        // Request Bluetooth permissions if necessary
-        if (!IDeviceScanner.isBluetoothPermissionGranted(this)) {
-            IDeviceScanner.requestBluetoothPermissions(
-                activity = this,
-                requestCode = PERMISSION_REQUEST_BLUETOOTH
-            )
-        }
+        checkAndRequestBluetoothPermissions()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -74,6 +68,11 @@ class MainActivity : AppCompatActivity() {
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
+    private fun checkAndRequestBluetoothPermissions() {
+        if (!IDeviceScanner.isBluetoothPermissionGranted(this)) {
+            IDeviceScanner.requestBluetoothPermissions(this, PERMISSION_REQUEST_BLUETOOTH)
+        }
+    }
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,

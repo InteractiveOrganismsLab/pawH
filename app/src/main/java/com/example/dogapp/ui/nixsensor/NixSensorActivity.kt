@@ -26,38 +26,132 @@ import com.nixsensor.universalsdk.IDeviceCompat
 import com.nixsensor.universalsdk.IDeviceScanner
 import com.nixsensor.universalsdk.DeviceScanner
 import com.nixsensor.universalsdk.DeviceStatus
+import com.nixsensor.universalsdk.IColorData
 import com.nixsensor.universalsdk.IMeasurementData
 import com.nixsensor.universalsdk.OnDeviceResultListener
 import com.nixsensor.universalsdk.ReferenceWhite
 import com.nixsensor.universalsdk.ScanMode
-
+import kotlin.math.pow
+import kotlin.math.sqrt
 class NixSensorActivity : AppCompatActivity() {
+
     private lateinit var binding: ActivityNixsensorBinding
-    private var savedImageUri: Uri? = null
     private var recalledDevice: IDeviceCompat? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Initialize binding
         binding = ActivityNixsensorBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Initialize and start the device scanner
-        //initializeScanner()
-
-        // Recall Device
+        setupUI()
         recallDevice()
+    }
 
-        // Set click listener for the send button
-        binding.buttonS.setOnClickListener {
-            Toast.makeText(this, "measure", Toast.LENGTH_SHORT).show()
-            sensorMeasure()
-        }
+    private fun setupUI() {
+        binding.buttonS.setOnClickListener { measureSensorData() }
+        binding.buttonH.setOnClickListener { navigateToHome() }
+    }
 
-        binding.buttonH.setOnClickListener {
-            navigateToHome()
+    private fun recallDevice() {
+        val deviceId = "CB:1A:6C:5A:7F:82"
+        val deviceName = "Nix Spectro 2"
+
+        recalledDevice = DeviceCompat(applicationContext, deviceId, deviceName)
+        connectToDevice()
+    }
+
+    private fun connectToDevice() {
+        recalledDevice?.connect(object : IDeviceCompat.OnDeviceStateChangeListener {
+            override fun onConnected(sender: IDeviceCompat) {
+                showToast("Connected to ${sender.name}")
+                updateUIOnConnection()
+            }
+
+            override fun onDisconnected(sender: IDeviceCompat, status: DeviceStatus) {
+                handleDisconnection(sender, status)
+            }
+
+            override fun onBatteryStateChanged(sender: IDeviceCompat, newState: Int) {
+                Log.d("NixSensorActivity", "Battery state: $newState")
+            }
+
+            override fun onExtPowerStateChanged(sender: IDeviceCompat, newState: Boolean) {
+                Log.d("NixSensorActivity", "External power state: $newState")
+            }
+        }) ?: Log.e("NixSensorActivity", "Recalled device is null, connection failed.")
+    }
+
+    private fun updateUIOnConnection() {
+        binding.rgbTextView.visibility = View.VISIBLE
+        binding.colorSquare.visibility = View.VISIBLE
+    }
+
+    private fun measureSensorData() {
+        recalledDevice?.measure(object : OnDeviceResultListener {
+            override fun onDeviceResult(status: CommandStatus, measurements: Map<ScanMode, IMeasurementData>?) {
+                if (status == CommandStatus.SUCCESS) {
+                    measurements?.get(ScanMode.M2)?.let { measurementData ->
+                        val colorData = measurementData.toColorData(ReferenceWhite.D50_2)
+                        updateColorDisplay(colorData)
+                        val predictedPH =  predictPH(colorData?.rgbValue ?: intArrayOf(0, 0, 0))
+                        updatePHDisplay(predictedPH)
+                    } ?: Log.e("NixSensorActivity", "Measurement data unavailable.")
+                } else {
+                    logMeasurementError(status)
+                }
+            }
+        }) ?: Log.e("NixSensorActivity", "Device is not connected.")
+    }
+
+    private fun updatePHDisplay(predictedPH: String) {
+        runOnUiThread {
+            binding.predictionsTextView.text = "pH: $predictedPH"
         }
+    }
+
+    private fun predictPH(rgbValue: IntArray): String {
+        val nearestLab = mapOf(
+            "6.0" to intArrayOf(79, 72, 103),
+            "7.0" to intArrayOf(93, 96, 114),
+            "8.0" to intArrayOf(86, 102, 105),
+            "9.0" to intArrayOf(71, 92, 86)
+        )
+
+        return nearestLab.minByOrNull { (_, value) ->
+            euclideanDistance(rgbValue, value)
+        }?.key ?: "Unknown"
+    }
+
+    private fun euclideanDistance(rgb1: IntArray, rgb2: IntArray): Double {
+        return sqrt(
+            (rgb1[0] - rgb2[0]).toDouble().pow(2) +
+                    (rgb1[1] - rgb2[1]).toDouble().pow(2) +
+                    (rgb1[2] - rgb2[2]).toDouble().pow(2)
+        )
+    }
+
+    private fun updateColorDisplay(colorData: IColorData?) {
+        colorData?.let {
+            val rgb = it.rgbValue
+            runOnUiThread {
+                binding.rgbTextView.text = "RGB: (${rgb[0]}, ${rgb[1]}, ${rgb[2]})"
+                binding.colorSquare.setBackgroundColor(Color.rgb(rgb[0], rgb[1], rgb[2]))
+            }
+        }
+    }
+
+    private fun logMeasurementError(status: CommandStatus) {
+        when (status) {
+            CommandStatus.ERROR_NOT_READY -> Log.e("NixSensorActivity", "Device not ready.")
+            CommandStatus.ERROR_LOW_POWER -> Log.e("NixSensorActivity", "Low battery power.")
+            else -> Log.e("NixSensorActivity", "Measurement error: $status")
+        }
+    }
+
+    private fun handleDisconnection(sender: IDeviceCompat, status: DeviceStatus) {
+        val message = "Disconnected: ${sender.name} Status: $status"
+        Log.d("NixSensorActivity", message)
+        showToast(message)
     }
 
     private fun initializeScanner() {
@@ -101,147 +195,16 @@ class NixSensorActivity : AppCompatActivity() {
         scanner.start(listener = deviceFoundListener)
     }
 
-    // Recall the known Nix device using its ID and Name
-    private fun recallDevice() {
-        val context: Context = applicationContext
-        val deviceId = "CB:1A:6C:5A:7F:82"  // The device ID obtained during scanning
-        val deviceName = "Nix Spectro 2"   // The device name obtained during scanning
-
-        // Create the IDeviceCompat instance
-        recalledDevice = DeviceCompat(context, deviceId, deviceName)
-
-        Log.d(TAG, "Recalled device: $deviceName with ID: $deviceId")
-
-        // Proceed to open a connection
-        openConnection()
-    }
-
-    // Open a connection to the recalled device
-    private fun openConnection() {
-        // Define the OnDeviceStateChangeListener
-        val deviceStateListener = object : IDeviceCompat.OnDeviceStateChangeListener {
-            override fun onConnected(sender: IDeviceCompat) {
-                // Device has connected successfully
-                Log.d(TAG, "Device connected: ${sender.name}")
-                // Show a toast when the device is connected
-                runOnUiThread {
-                    Toast.makeText(this@NixSensorActivity, "Device connected: ${sender.name}", Toast.LENGTH_SHORT).show()
-                }
-
-                // You can now query the device and perform operations
-            }
-
-            override fun onDisconnected(sender: IDeviceCompat, status: DeviceStatus) {
-                // Handle disconnection, check status codes
-                Log.d(TAG, "Device disconnected: ${sender.name} with status: $status")
-
-                when (status) {
-                    DeviceStatus.ERROR_UNAUTHORIZED -> {
-                        Log.e(TAG, "Device not authorized for this SDK build")
-                    }
-                    DeviceStatus.SUCCESS -> {
-                        Log.d(TAG, "Normal disconnect")
-                    }
-                    DeviceStatus.ERROR_DROPPED_CONNECTION -> {
-                        Log.e(TAG, "Device dropped the connection")
-                    }
-                    DeviceStatus.ERROR_TIMEOUT -> {
-                        Log.e(TAG, "Connection to device timed out")
-                    }
-                    else -> {
-                        Log.e(TAG, "Other connection error: $status")
-                    }
-                }
-            }
-
-            override fun onBatteryStateChanged(sender: IDeviceCompat, newState: Int) {
-                // Handle battery state changes if needed
-                Log.d(TAG, "Battery state changed: $newState")
-            }
-
-            override fun onExtPowerStateChanged(sender: IDeviceCompat, newState: Boolean) {
-                // Handle external power state changes if needed
-                Log.d(TAG, "External power state changed: $newState")
-            }
-        }
-
-        // Connect to the recalled device
-        recalledDevice?.connect(deviceStateListener)
-    }
-
-    // Define callback for measurement
-    private val measureListener = object : OnDeviceResultListener {
-        override fun onDeviceResult(
-            status: CommandStatus,
-            measurements: Map<ScanMode, IMeasurementData>?
-        ) {
-            when (status) {
-                CommandStatus.SUCCESS -> {
-                    // Successful operation
-                    measurements?.let {
-                        // Assuming you're using a specific ScanMode, e.g., ScanMode.M2
-                        val measurementData = it[ScanMode.M2]
-                        val referenceWhite = ReferenceWhite.D50_2
-                        measurementData?.let { data ->
-                            if (data.providesColor(referenceWhite)) {
-                                val colorData = data.toColorData(referenceWhite)
-                                colorData?.let { color ->
-                                    val rgbValue = color.rgbValue
-                                    val rgbString = "RGB: (${rgbValue[0]}, ${rgbValue[1]}, ${rgbValue[2]})"
-                                    Log.d(TAG, rgbString)
-
-                                    // Show the RGB value on a TextView and set the color of the square
-                                    runOnUiThread {
-                                        binding.rgbTextView.text = rgbString
-                                        binding.rgbTextView.visibility = View.VISIBLE
-                                        val colorInt = Color.rgb(rgbValue[0], rgbValue[1], rgbValue[2])
-                                        binding.colorSquare.setBackgroundColor(colorInt)
-                                        binding.colorSquare.visibility = View.VISIBLE
-                                    }
-                                } ?: run {
-                                    Log.e(TAG, "Failed to obtain IColorData")
-                                }
-                            } else {
-                                Log.e(TAG, "Color data not available for this reference white")
-                            }
-                        } ?: run {
-                            Log.e(TAG, "No measurement data available")
-                        }
-                    }
-                }
-                CommandStatus.ERROR_NOT_READY -> {
-                    // Did not complete because the device was busy
-                }
-                CommandStatus.ERROR_NOT_SUPPORTED -> {
-                    // Did not complete because an unsupported scan mode was specified
-                }
-                CommandStatus.ERROR_LOW_POWER -> {
-                    // Did not complete because the battery level is too low
-                }
-                CommandStatus.ERROR_TIMEOUT -> {
-                    // Timeout when waiting for result
-                }
-                CommandStatus.ERROR_AMBIENT_LIGHT -> {
-                    // Did not complete because of ambient light leakage
-                }
-                else -> {
-                    // Did not complete because of other internal error
-                }
-            }
-        }
-    }
-
-
-    private fun sensorMeasure(){
-        recalledDevice?.let {
-            it.measure(measureListener)
-        } ?: run {
-            Log.e(TAG, "Device is not connected or initialized")
-        }
-    }
-
     private fun navigateToHome() {
-        val intent = Intent(this, MainActivity::class.java)
-        startActivity(intent)
+        startActivity(Intent(this, MainActivity::class.java))
+    }
+
+    override fun onDestroy() {
+        recalledDevice?.disconnect()
+        super.onDestroy()
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }
