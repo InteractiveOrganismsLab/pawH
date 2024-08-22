@@ -111,10 +111,10 @@ class NixSensorActivity : AppCompatActivity() {
 
     private fun predictPH(rgbValue: IntArray): String {
         val nearestLab = mapOf(
-            "5.0" to intArrayOf(134, 44, 60),
-            "6.0" to intArrayOf(148, 71, 77),
-            "7.0" to intArrayOf(134, 55, 77),
-            "8.0" to intArrayOf(132, 56, 71)
+            "6.0" to intArrayOf(79, 72, 103),
+            "7.0" to intArrayOf(93, 96, 114),
+            "8.0" to intArrayOf(86, 102, 105),
+            "9.0" to intArrayOf(71, 92, 86)
         )
 
         return nearestLab.minByOrNull { (_, value) ->
