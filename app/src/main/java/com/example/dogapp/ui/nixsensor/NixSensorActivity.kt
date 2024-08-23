@@ -33,16 +33,26 @@ import com.nixsensor.universalsdk.ReferenceWhite
 import com.nixsensor.universalsdk.ScanMode
 import kotlin.math.pow
 import kotlin.math.sqrt
+import androidx.core.graphics.ColorUtils
+import com.example.dogapp.R
+
 class NixSensorActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityNixsensorBinding
     private var recalledDevice: IDeviceCompat? = null
 
+    val phColors = mapOf(
+        "6.0" to intArrayOf(79, 72, 103),
+        "7.0" to intArrayOf(93, 96, 114),
+        "8.0" to intArrayOf(86, 102, 105),
+        "9.0" to intArrayOf(71, 92, 86)
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityNixsensorBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        displayPHColors()
         setupUI()
         recallDevice()
     }
@@ -64,7 +74,7 @@ class NixSensorActivity : AppCompatActivity() {
         recalledDevice?.connect(object : IDeviceCompat.OnDeviceStateChangeListener {
             override fun onConnected(sender: IDeviceCompat) {
                 showToast("Connected to ${sender.name}")
-                updateUIOnConnection()
+                updateButtonOnConnection()
             }
 
             override fun onDisconnected(sender: IDeviceCompat, status: DeviceStatus) {
@@ -79,6 +89,32 @@ class NixSensorActivity : AppCompatActivity() {
                 Log.d("NixSensorActivity", "External power state: $newState")
             }
         }) ?: Log.e("NixSensorActivity", "Recalled device is null, connection failed.")
+    }
+
+    private fun updateButtonOnConnection() {
+        runOnUiThread {
+            binding.buttonS.apply {
+                text = "Analyze"
+                isEnabled = true
+                backgroundTintList = getColorStateList(R.color.purple_500)
+            }
+        }
+    }
+
+    private fun displayPHColors() {
+        // Set the background color of each sample view
+        phColors["6.0"]?.let { rgb ->
+            binding.colorSample6.setBackgroundColor(Color.rgb(rgb[0], rgb[1], rgb[2]))
+        }
+        phColors["7.0"]?.let { rgb ->
+            binding.colorSample7.setBackgroundColor(Color.rgb(rgb[0], rgb[1], rgb[2]))
+        }
+        phColors["8.0"]?.let { rgb ->
+            binding.colorSample8.setBackgroundColor(Color.rgb(rgb[0], rgb[1], rgb[2]))
+        }
+        phColors["9.0"]?.let { rgb ->
+            binding.colorSample9.setBackgroundColor(Color.rgb(rgb[0], rgb[1], rgb[2]))
+        }
     }
 
     private fun updateUIOnConnection() {
@@ -106,20 +142,21 @@ class NixSensorActivity : AppCompatActivity() {
     private fun updatePHDisplay(predictedPH: String) {
         runOnUiThread {
             binding.predictionsTextView.text = "pH: $predictedPH"
+            binding.predictionsTextView.visibility = View.VISIBLE
         }
     }
 
     private fun predictPH(rgbValue: IntArray): String {
-        val nearestLab = mapOf(
-            "6.0" to intArrayOf(79, 72, 103),
-            "7.0" to intArrayOf(93, 96, 114),
-            "8.0" to intArrayOf(86, 102, 105),
-            "9.0" to intArrayOf(71, 92, 86)
-        )
+        val nearestLab = phColors
+        val distances = nearestLab.map { (ph, value) ->
+            val distance = euclideanDistance(rgbValue, value)
+            val labdistance = labDistance(rgbValue,value)
+            Log.d(TAG, "RGB Distance to pH $ph: $distance")
+            Log.d(TAG, "LAB Distance to pH $ph: $labdistance")
+            ph to distance
+        }
 
-        return nearestLab.minByOrNull { (_, value) ->
-            euclideanDistance(rgbValue, value)
-        }?.key ?: "Unknown"
+        return distances.minByOrNull { it.second }?.first ?: "Unknown"
     }
 
     private fun euclideanDistance(rgb1: IntArray, rgb2: IntArray): Double {
@@ -130,11 +167,28 @@ class NixSensorActivity : AppCompatActivity() {
         )
     }
 
+    private fun labDistance(rgb1: IntArray, rgb2: IntArray): Double {
+        val lab1 = DoubleArray(3)
+        val lab2 = DoubleArray(3)
+
+        // Convert RGB to LAB
+        ColorUtils.RGBToLAB(rgb1[0], rgb1[1], rgb1[2], lab1)
+        ColorUtils.RGBToLAB(rgb2[0], rgb2[1], rgb2[2], lab2)
+
+        // Calculate the Euclidean distance in LAB space
+        return sqrt(
+            (lab1[0] - lab2[0]).toDouble().pow(2) +
+                    (lab1[1] - lab2[1]).toDouble().pow(2) +
+                    (lab1[2] - lab2[2]).toDouble().pow(2)
+        )
+    }
+
     private fun updateColorDisplay(colorData: IColorData?) {
         colorData?.let {
+            updateUIOnConnection()
             val rgb = it.rgbValue
             runOnUiThread {
-                binding.rgbTextView.text = "RGB: (${rgb[0]}, ${rgb[1]}, ${rgb[2]})"
+                // binding.rgbTextView.text = "RGB: (${rgb[0]}, ${rgb[1]}, ${rgb[2]})"
                 binding.colorSquare.setBackgroundColor(Color.rgb(rgb[0], rgb[1], rgb[2]))
             }
         }
