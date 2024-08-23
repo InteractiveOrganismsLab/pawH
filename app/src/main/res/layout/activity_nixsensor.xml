@@ -24,7 +24,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="pH: "
-        android:textColor="@color/gray"
+        android:visibility="gone"
+        android:textColor="@color/brown"
         android:textSize="50sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -32,18 +33,20 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.623" />
+        app:layout_constraintVertical_bias="0.704" />
 
     <Button
         android:id="@+id/buttonS"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Analyze"
+        android:layout_width="160dp"
+        android:layout_height="90dp"
+        android:text="Finding Device"
+        android:textSize="18sp"
+        android:enabled="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.976" />
+        app:layout_constraintVertical_bias="0.871" />
 
     <Button
         android:id="@+id/buttonH"
@@ -72,7 +75,7 @@
         android:id="@+id/textrange"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Nix Sensor"
+        android:text="Color Chart"
         android:textSize="25sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -84,20 +87,20 @@
         android:id="@+id/rgbTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="RGB:"
-        android:textSize="25sp"
+        android:text="Click ANALYZE to start reading pH value"
+        android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.49"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.368" />
+        app:layout_constraintVertical_bias="0.394" />
 
     <View
         android:id="@+id/colorSquare"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:background="#000000"
+        android:background="#FFFFFF"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -105,5 +108,115 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.529" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="100dp"
+        android:layout_margin="16dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.199">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <View
+                android:id="@+id/colorSample6"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="#000000" />
+
+            <TextView
+                android:id="@+id/textSample6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="pH 6.0"
+                android:textColor="#000000"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <View
+                android:id="@+id/colorSample7"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="#000000" />
+
+            <TextView
+                android:id="@+id/textSample7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="pH 7.0"
+                android:textColor="#000000"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <View
+                android:id="@+id/colorSample8"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="#000000" />
+
+            <TextView
+                android:id="@+id/textSample8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="pH 8.0"
+                android:textColor="#000000"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <View
+                android:id="@+id/colorSample9"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="#000000" />
+
+            <TextView
+                android:id="@+id/textSample9"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="pH 9.0"
+                android:textColor="#000000"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
