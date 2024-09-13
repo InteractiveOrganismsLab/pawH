@@ -23,30 +23,29 @@
         android:id="@+id/predictionsTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="pH: "
-        android:visibility="gone"
+        android:text="pH: 7.0"
         android:textColor="@color/brown"
         android:textSize="50sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.704" />
+        app:layout_constraintVertical_bias="0.737" />
 
     <Button
         android:id="@+id/buttonS"
         android:layout_width="160dp"
         android:layout_height="90dp"
-        android:text="Finding Device"
+        android:text="Analyze"
         android:textSize="18sp"
-        android:enabled="false"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.871" />
+        app:layout_constraintVertical_bias="0.9" />
 
     <Button
         android:id="@+id/buttonH"
@@ -94,14 +93,13 @@
         app:layout_constraintHorizontal_bias="0.49"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.394" />
+        app:layout_constraintVertical_bias="0.365" />
 
     <View
         android:id="@+id/colorSquare"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:background="#FFFFFF"
-        android:visibility="gone"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:background="#5A6175"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
@@ -129,8 +127,8 @@
 
             <View
                 android:id="@+id/colorSample6"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
                 android:background="#000000" />
 
             <TextView
@@ -153,8 +151,8 @@
 
             <View
                 android:id="@+id/colorSample7"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
                 android:background="#000000" />
 
             <TextView
@@ -177,8 +175,8 @@
 
             <View
                 android:id="@+id/colorSample8"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
                 android:background="#000000" />
 
             <TextView
@@ -201,8 +199,8 @@
 
             <View
                 android:id="@+id/colorSample9"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
                 android:background="#000000" />
 
             <TextView
